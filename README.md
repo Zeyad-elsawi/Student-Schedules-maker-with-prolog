@@ -11,9 +11,10 @@ This tool reads a single Prolog file (Scheduling System.pl) containing both the 
 ## Repository Structure
 
 
-├── Scheduling System.pl    # Combined Prolog KB and implementation
+├── code.pl                 #   implementation
 ├── public_tests.pl         # Official PlUnit test suite for grading
 └── README.md               # This document
+|__ publicKB                 # Knowledge base
 
 
 ## Prerequisites
@@ -24,11 +25,11 @@ This tool reads a single Prolog file (Scheduling System.pl) containing both the 
 ## Installation
 
 1. Clone this repository.
-2. Ensure Scheduling System.pl and public_tests.pl are in the same folder.
+2. Ensure code.pl ,publicKB and  public_tests.pl are in the same folder.
 
 ## How It Works
 
-Your Scheduling System.pl implements the following core predicates:
+Your code.pl implements the following core predicates:
 
 1. **university_schedule(-S)**
    Binds S to a list of sched(StudentID, Slots) structures, where each Slots is a list of slot(Day, SlotNumber, CourseCode).
@@ -56,7 +57,7 @@ Your Scheduling System.pl implements the following core predicates:
 To load your program in SWI‑Prolog:
 
 prolog
-?- ['Scheduling System'].
+?- ['code'].
 ?- [public_tests].
 
 
@@ -137,3 +138,6 @@ You should see output like:
 2. Create a feature branch: git checkout -b feature/your-feature
 3. Commit your changes.
 4. Open a Pull Request with a clear description of your updates.
+
+![image](https://github.com/user-attachments/assets/78137c4f-5bc7-46a9-9880-127bb1b68a67)
+
