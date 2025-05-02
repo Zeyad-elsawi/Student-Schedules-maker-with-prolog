@@ -1,27 +1,89 @@
 
-University Course Schedule in Prolog
+roject Overview
+A Prolog‑based class scheduling assistant that
 
-This project is a Prolog-based scheduling system developed for CSEN 403 – Concepts of Programming Languages at the German University in Cairo. It uses a provided knowledge base (publicKB.pl) containing student enrollments and daily course schedules to automatically generate non-clashing timetables for each student.
+generates conflict‑free timetables for all students
+enforces exactly 2 days off per week per student
+identifies common free slots for assemblies or office hours
+This tool reads a single Prolog file (Scheduling System.pl) containing both the student knowledge base and your implementation of the required predicates.
 
-Key Features:
+Repository Structure
+├── Scheduling System.pl    # Combined Prolog KB and implementation
+├── public_tests.pl         # Official PlUnit test suite for grading
+└── README.md               # This document
+Prerequisites
+SWI‑Prolog (tested on v8.4+)
+Unix‑style shell (if running tests via shell), or use the SWI‑Prolog REPL.
+Installation
+Clone this repository.
+Ensure Scheduling System.pl and public_tests.pl are in the same folder.
+How It Works
+Your Scheduling System.pl implements the following core predicates:
 
-Student Schedule Generation:
-For every student (identified by a unique Student_id), the program collects the courses they’re enrolled in and gathers all possible time slots for each course. By exploring permutations of these slots, it identifies a combination that meets the following constraints:
+university_schedule(-S) Binds S to a list of sched(StudentID, Slots) structures, where each Slots is a list of slot(Day, SlotNumber, CourseCode).
 
-No Time Clashes: Two courses cannot occupy the same day and time slot.
+student_schedule(+StudentID, -Slots) Retrieves all slot/3 entries for a given StudentID.
 
-Limited Study Days: The schedule is restricted to a maximum number of unique days (leaving two days off per week).
+no_clashes(+Slots) Succeeds if no two slots in Slots share both the same day and slot number.
 
-Assembly Hours Identification:
-The system also computes common free slots (assembly hours) for all students based on their schedules. It filters available time slots so that each selected slot is free (unused by any student) and occurs on a day when all students have classes.
+study_days(+Slots, +DayCount) Verifies that the student’s Slots span no more than DayCount distinct days (here, 5 – 2 days off).
 
-Clean Code and Modularity:
-The solution is structured using higher-order predicates like maplist/3 and custom helper predicates (such as permutate/2 and sort_by_course/2) to simplify complex logical operations.
-All constraints are enforced declaratively, and the code is well-commented for ease of understanding and future extensions.
+assembly_hours(+Schedules, -AH) Computes a list AH of slot(Day, SlotNumber) where all students are simultaneously free (and not on a day off).
 
-Technologies:
+Please note that sometimes the output could be too big to be fully displayed, resulting in ellipses (...) in the REPL.
 
-Prolog (SWI-Prolog)
+To show the complete result, add this command in the Prolog REPL:
+
+?- set_prolog_flag(answer_write_options,[max_depth(0)]).
+To load your program in SWI‑Prolog:
+
+?- ['Scheduling System'].
+?- [public_tests].
+Then invoke any predicate, for example:
+
+?- university_schedule(S).
+?- student_schedule(student_0, Slots).
+?- assembly_hours(S, AH).
+Examples
+Below are sample interactions demonstrating key functionality (actual output may vary based on your KB data):
+
+Generate Full University Schedule
+?- university_schedule(S).
+S = [sched(student_17,[slot(saturday,1,csen601),slot(saturday,3,csen602),slot(thursday,2,csen603),slot(monday,2,csen604),slot(sunday,1,dmet604)]),sched(student_18,[slot(sunday,1,csen403),slot(thursday,2,csen603),slot(monday,2,csen604),slot(tuesday,3,dmet604),slot(saturday,1,math401)]),sched(student_19,[slot(sunday,1,csen403),slot(saturday,1,csen602),slot(thursday,2,csen603),slot(monday,2,csen604),slot(thursday,4,csen907)]),sched(student_27,[slot(tuesday,2,csen1002),slot(sunday,1,csen1003),slot(thursday,4,csen907),slot(sunday,2,dmet1001),slot(wednesday,2,huma1001),slot(tuesday,3,netw1009)]),sched(student_28,[slot(tuesday,2,csen1002),slot(sunday,1,csen1003),slot(saturday,1,csen602),slot(thursday,2,csen603),slot(thursday,4,csen907),slot(tuesday,3,netw1009)]),sched(student_29,[slot(tuesday,2,csen1002),slot(monday,2,csen401),slot(sunday,1,csen403),slot(thursday,4,csen907),slot(sunday,2,dmet1001),slot(wednesday,2,huma1001)]),sched(student_7,[slot(monday,2,csen401),slot(sunday,1,csen403),slot(tuesday,4,csis402),slot(monday,5,de404),slot(wednesday,3,elct401),slot(saturday,1,math401),slot(saturday,3,rpw401)]),sched(student_8,[slot(monday,2,csen401),slot(saturday,1,csen602),slot(sunday,1,csis402),slot(monday,5,de404),slot(tuesday,4,elct401),slot(sunday,2,math401),slot(saturday,3,rpw401)]),sched(student_9,[slot(monday,2,csen401),slot(saturday,1,csen601),slot(monday,5,de404),slot(sunday,2,dmet1001),slot(tuesday,4,elct401),slot(wednesday,1,math401),slot(saturday,3,rpw401)])]; 
+Retrieve a Student's Schedule
+?- student_schedule(student_1, Slots).
+Slots = [ slot(tuesday,3,phy201), slot(friday,4,eng150) ].
+Check for Clashes
+?- no_clashes([slot(monday,1,cs101), slot(monday,1,math102)]).
+false.
+Compute Common Free Slots (Assembly Hours)
+?- university_schedule(All), assembly_hours(All, AH).
+AH = [ slot(thursday,2), slot(wednesday,5) ].
+Testing
+We employ automated testing using SWI‑Prolog’s PlUnit framework. The official public test suite is provided in public_tests.pl.
+
+Automated Testing (PlUnit)
+To run the public tests:
+
+Ensure public_tests.pl references Scheduling System.pl at the top.
+
+From the UNIX shell:
+
+swipl -q -s "Scheduling System.pl" -s public_tests.pl \
+       -g run_tests -g halt
+Or within the SWI‑Prolog REPL:
+
+?- ['Scheduling System'], [public_tests].
+?- run_tests, halt.
+You should see output like:
+
+% PL-Unit: public_tests ... done
+% All public tests passed
+Contributing
+Fork the repository.
+Create a feature branch: git checkout -b feature/your-feature
+Commit your changes.
+Open a Pull Request with a clear description of your updates.
 
 Standard built-in predicates for list processing and sorting
 
